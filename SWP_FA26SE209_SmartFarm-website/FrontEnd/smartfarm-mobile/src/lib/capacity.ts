@@ -1,0 +1,3 @@
+export const demoTrayCapacity = { available: 12, total: 24, optionName: "Khay rau mầm tiêu chuẩn" };
+export const validTrayQuantity = (quantity: number) => Number.isInteger(quantity) && quantity > 0 && quantity <= demoTrayCapacity.available;
+export function availableTrayCapacity(payments: { status: string; items: { type: string; qty: number }[] }[]) { const used = payments.filter((payment) => payment.status === "Paid").reduce((total, payment) => total + payment.items.filter((item) => item.type === "tray").reduce((sum, item) => sum + item.qty, 0), 0); return Math.max(0, demoTrayCapacity.available - used); }

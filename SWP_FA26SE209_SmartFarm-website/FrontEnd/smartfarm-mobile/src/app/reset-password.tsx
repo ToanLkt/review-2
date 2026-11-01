@@ -1,0 +1,5 @@
+import { useState } from "react";
+import { useRouter } from "expo-router";
+import { AppText, FormField, PrimaryButton, Screen } from "@/components/ui";
+import { useAuth } from "@/hooks/auth";
+export default function ResetPassword() { const router = useRouter(); const { resetPassword } = useAuth(); const [password, setPassword] = useState(""); const [confirm, setConfirm] = useState(""); const [error, setError] = useState(""); return <Screen><AppText weight="bold" className="mt-12 text-[26px] text-ink">Đặt lại mật khẩu</AppText><AppText className="my-4 text-[14px] text-muted">Liên kết khôi phục demo đã xác nhận.</AppText><FormField label="Mật khẩu mới" value={password} onChangeText={setPassword} secureTextEntry /><FormField label="Xác nhận mật khẩu" value={confirm} onChangeText={setConfirm} secureTextEntry />{error ? <AppText className="my-3 text-[12px] text-red-600">{error}</AppText> : null}<PrimaryButton title="Đặt lại mật khẩu" onPress={() => password === confirm && resetPassword(password) ? router.replace("/sign-in") : setError("Mật khẩu không khớp hoặc chưa yêu cầu khôi phục.")} /></Screen>; }

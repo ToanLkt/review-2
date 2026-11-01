@@ -1,0 +1,21 @@
+.stepEnter {
+  animation: step-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes step-enter {
+  from {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepEnter {
+    animation: none;
+  }
+}

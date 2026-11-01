@@ -1,0 +1,135 @@
+<svg width="1200" height="980" viewBox="0 0 1200 980" xmlns="http://www.w3.org/2000/svg">
+<defs>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap');
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .title { font-size: 19px; font-weight: 700; fill: #000000; text-anchor: middle; letter-spacing: -0.01em; }
+        .subtitle { font-size: 12px; font-weight: 500; fill: #333333; text-anchor: middle; }
+        .lane-title { font-size: 13px; font-weight: 700; fill: #000000; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.06em; }
+        .lane-sub { font-size: 10px; font-weight: 500; fill: #555555; text-anchor: middle; }
+        .action-text { font-size: 12.5px; font-weight: 700; fill: #000000; text-anchor: middle; }
+        .action-sub { font-size: 9.5px; font-weight: 500; fill: #333333; text-anchor: middle; font-family: 'JetBrains Mono', monospace; }
+        .edge-label { font-size: 10px; font-weight: 700; fill: #000000; text-anchor: middle; }
+        .line { fill: none; stroke: #000000; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        .line-loop { fill: none; stroke: #000000; stroke-width: 1.3; stroke-dasharray: 5,4; stroke-linecap: round; stroke-linejoin: round; }
+      </style>
+      <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" fill="#000000"/>
+      </marker>
+    </defs>
+<rect width="1200" height="980" fill="#ffffff"/>
+
+    <g transform="translate(0, 0)">
+      <rect x="30" y="16" width="1140" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+      <text class="title" x="600" y="37">Activity Diagram 4: IoT Monitoring &amp; Auto Control Loop</text>
+      <text class="subtitle" x="600" y="52">Automated Loop: Sensor Telemetry, Threshold Analysis, Actuator Control &amp; FCM Alerting</text>
+    </g>
+<rect x="30" y="118" width="240" height="835" fill="#ffffff" stroke="#000000" stroke-width="1.2"/>
+<rect x="30" y="74" width="240" height="44" fill="#f5f5f5" stroke="#000000" stroke-width="1.2"/>
+<text class="lane-title" x="150" y="94">ESP32 NODE (IOT)</text>
+<text class="lane-sub" x="150" y="109">Sensors &amp; Actuator Relay Control</text>
+<rect x="270" y="118" width="220" height="835" fill="#ffffff" stroke="#000000" stroke-width="1.2"/>
+<rect x="270" y="74" width="220" height="44" fill="#f5f5f5" stroke="#000000" stroke-width="1.2"/>
+<text class="lane-title" x="380" y="94">MQTT BROKER</text>
+<text class="lane-sub" x="380" y="109">Eclipse Mosquitto (Pub/Sub)</text>
+<rect x="490" y="118" width="420" height="835" fill="#ffffff" stroke="#000000" stroke-width="1.2"/>
+<rect x="490" y="74" width="420" height="44" fill="#f5f5f5" stroke="#000000" stroke-width="1.2"/>
+<text class="lane-title" x="700" y="94">SUMFAS BACKEND</text>
+<text class="lane-sub" x="700" y="109">Worker Service &amp; Telemetry Engine</text>
+<rect x="910" y="118" width="260" height="835" fill="#ffffff" stroke="#000000" stroke-width="1.2"/>
+<rect x="910" y="74" width="260" height="44" fill="#f5f5f5" stroke="#000000" stroke-width="1.2"/>
+<text class="lane-title" x="1040" y="94">CLOUD DB &amp; NOTIFICATIONS</text>
+<text class="lane-sub" x="1040" y="109">MySQL Database &amp; Firebase FCM</text>
+<circle cx="150" cy="145" r="9" fill="#000000"/>
+<rect x="60" y="175" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="150.0" y="196.0">Read Sensors</text>
+<text class="action-sub" x="150.0" y="211.0">Temp, Humidity, Soil, Light</text>
+<rect x="60" y="245" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="150.0" y="266.0">Create JSON</text>
+<text class="action-sub" x="150.0" y="281.0">DeviceCode, Telemetry Data</text>
+<rect x="60" y="315" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="150.0" y="336.0">Publish Telemetry</text>
+<text class="action-sub" x="150.0" y="351.0">smartfarm/.../telemetry</text>
+<rect x="295" y="315" width="170" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="380.0" y="336.0">Receive &amp; Forward</text>
+<text class="action-sub" x="380.0" y="351.0">QoS 1 Message Dispatch</text>
+<rect x="670" y="315" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="760.0" y="336.0">Process Data</text>
+<text class="action-sub" x="760.0" y="351.0">MqttSubscriberWorker</text>
+<rect x="670" y="385" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="760.0" y="406.0">Update Device</text>
+<text class="action-sub" x="760.0" y="421.0">LastSeen &amp; Status = ONLINE</text>
+<rect x="950" y="385" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="1040.0" y="406.0">Save Telemetry</text>
+<text class="action-sub" x="1040.0" y="421.0">SensorTelemetry Table</text>
+<rect x="670" y="460" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="760.0" y="481.0">Get Thresholds</text>
+<text class="action-sub" x="760.0" y="496.0">CropThresholds by Season</text>
+
+        <polygon points="760,520.0 820.0,550 760,580.0 700.0,550" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+        <text class="action-text" x="760" y="554" font-size="12px">Check Value</text>
+<rect x="510" y="630" width="130" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="575.0" y="651.0">Keep Status</text>
+<text class="action-sub" x="575.0" y="666.0">Environment Stable</text>
+<rect x="670" y="630" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="760.0" y="651.0">Create ActuatorLog</text>
+<text class="action-sub" x="760.0" y="666.0">Result = PENDING</text>
+<rect x="670" y="700" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="760.0" y="721.0">Publish Command</text>
+<text class="action-sub" x="760.0" y="736.0">smartfarm/.../commands</text>
+<rect x="295" y="700" width="170" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="380.0" y="721.0">Forward Command</text>
+<text class="action-sub" x="380.0" y="736.0">Dispatch Command to Node</text>
+<rect x="60" y="700" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="150.0" y="721.0">Trigger Relay</text>
+<text class="action-sub" x="150.0" y="736.0">Toggle Pump, Fan, Light</text>
+<rect x="60" y="770" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="150.0" y="791.0">Send ACK</text>
+<text class="action-sub" x="150.0" y="806.0">Topic: .../command-acks</text>
+<rect x="670" y="770" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="760.0" y="791.0">Update Result</text>
+<text class="action-sub" x="760.0" y="806.0">Result = SUCCESS</text>
+<rect x="950" y="527" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="1040.0" y="548.0">Create Alert</text>
+<text class="action-sub" x="1040.0" y="563.0">SystemAlert (CRITICAL)</text>
+<rect x="950" y="630" width="180" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.4"/>
+<text class="action-text" x="1040.0" y="651.0">Send FCM Notification</text>
+<text class="action-sub" x="1040.0" y="666.0">Push to Staff &amp; Customer App</text>
+
+    <g transform="translate(760, 890)">
+      <circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+      <circle cx="0" cy="0" r="8" fill="#000000"/>
+    </g>
+<line class="line" x1="150" y1="154" x2="150" y2="175" marker-end="url(#arrow)"/>
+<line class="line" x1="150" y1="221" x2="150" y2="245" marker-end="url(#arrow)"/>
+<line class="line" x1="150" y1="291" x2="150" y2="315" marker-end="url(#arrow)"/>
+<line class="line" x1="240" y1="338" x2="295" y2="338" marker-end="url(#arrow)"/>
+<line class="line" x1="465" y1="338" x2="670" y2="338" marker-end="url(#arrow)"/>
+<line class="line" x1="760" y1="361" x2="760" y2="385" marker-end="url(#arrow)"/>
+<line class="line" x1="850" y1="408" x2="950" y2="408" marker-end="url(#arrow)"/>
+<line class="line" x1="760" y1="431" x2="760" y2="460" marker-end="url(#arrow)"/>
+<line class="line" x1="760" y1="506" x2="760" y2="520" marker-end="url(#arrow)"/>
+<path class="line" d="M 700 550 H 575 V 630" marker-end="url(#arrow)"/>
+<rect x="547" y="534" width="56" height="15" rx="2" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+<text class="edge-label" x="575" y="546">[Normal]</text>
+<path class="line" d="M 575 676 V 850 H 742 V 876" marker-end="url(#arrow)"/>
+<line class="line" x1="760" y1="580" x2="760" y2="630" marker-end="url(#arrow)"/>
+<rect x="714" y="584" width="92" height="15" rx="2" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+<text class="edge-label" x="760" y="596">[Auto Control]</text>
+<line class="line" x1="760" y1="676" x2="760" y2="700" marker-end="url(#arrow)"/>
+<line class="line" x1="670" y1="723" x2="465" y2="723" marker-end="url(#arrow)"/>
+<line class="line" x1="295" y1="723" x2="240" y2="723" marker-end="url(#arrow)"/>
+<line class="line" x1="150" y1="746" x2="150" y2="770" marker-end="url(#arrow)"/>
+<line class="line" x1="240" y1="793" x2="670" y2="793" marker-end="url(#arrow)"/>
+<line class="line" x1="760" y1="816" x2="760" y2="876" marker-end="url(#arrow)"/>
+<line class="line" x1="820" y1="550" x2="950" y2="550" marker-end="url(#arrow)"/>
+<rect x="835" y="534" width="78" height="15" rx="2" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+<text class="edge-label" x="874" y="546">[Critical Alert]</text>
+<line class="line" x1="1040" y1="573" x2="1040" y2="630" marker-end="url(#arrow)"/>
+<path class="line" d="M 1040 676 V 850 H 778 V 876" marker-end="url(#arrow)"/>
+
+    <path class="line-loop" d="M 760 904 V 945 H 48 V 198 H 60" marker-end="url(#arrow)"/>
+    <rect x="48" y="934" width="240" height="16" rx="2" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+    <text class="edge-label" x="168" y="946">Next reading cycle (periodic 30s - 1 min)</text>
+    
+</svg>

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 650" width="860" height="650" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#000000" />
+    </marker>
+  </defs>
+  <!-- Title Container -->
+  <rect x="20" y="16" width="820" height="50" fill="#f8f8f8" stroke="#000000" stroke-width="1.5" rx="4"/>
+  <text x="430" y="38" font-size="16" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="0.5">State Machine Diagram: IoT Device Connection Lifecycle</text>
+  <text x="430" y="55" font-size="11" font-weight="400" fill="#555555" text-anchor="middle">MQTT Connectivity, Telemetry Streaming, Watchdog Stale Detection &amp; Administration</text>
+  <rect x="20" y="76" width="820" height="554" fill="#ffffff" stroke="#000000" stroke-width="1.5" rx="4"/>
+  <!-- Initial State: Device Provisioning -->
+  <circle cx="440" cy="96" r="8" fill="#000000" stroke="#000000" stroke-width="1.5"/>
+  <line x1="440" y1="104" x2="440" y2="138" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="365" y="111" width="150" height="20" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="440" y="125" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">RegisterDeviceAsync()</text>
+  <!-- State: OFFLINE -->
+  <rect x="360" y="138" width="160" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="440" y="166" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">OFFLINE</text>
+  <!-- State: INACTIVE -->
+  <rect x="60" y="138" width="150" height="46" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="135" y="166" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">INACTIVE</text>
+  <!-- Transition: DeactivateDeviceAsync() -->
+  <line x1="360" y1="149" x2="210" y2="149" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="215" y="140" width="140" height="18" rx="2" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="285" y="153" font-size="8.5" font-weight="600" fill="#000000" text-anchor="middle">DeactivateDeviceAsync()</text>
+  <!-- Transition: Reactivate device -->
+  <line x1="210" y1="173" x2="360" y2="173" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="230" y="164" width="110" height="18" rx="2" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="285" y="177" font-size="8.5" font-weight="600" fill="#000000" text-anchor="middle">Reactivate device</text>
+  <!-- Transition: Decommission -> Final Node -->
+  <line x1="135" y1="184" x2="135" y2="475" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="65" y="315" width="140" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="135" y="330" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">Decommission / Delete</text>
+  <!-- Final State (Bullseye) -->
+  <circle cx="135" cy="495" r="12" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <circle cx="135" cy="495" r="6" fill="#000000"/>
+  <!-- Transition: OFFLINE -> ONLINE -->
+  <line x1="440" y1="184" x2="440" y2="245" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="340" y="202" width="200" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="440" y="217" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Heartbeat / Telemetry packet</text>
+  <!-- State: ONLINE -->
+  <rect x="360" y="245" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="440" y="269" font-size="11.5" font-weight="700" fill="#000000" text-anchor="middle">ONLINE</text>
+  <!-- Self-Transition: Streaming Telemetry -->
+  <path d="M 360 255 H 315 V 275 H 360" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="305" y="263" font-size="8.5" font-weight="600" fill="#000000" text-anchor="end">Stream data</text>
+  <text x="305" y="275" font-size="8" fill="#555555" text-anchor="end">[LastSeen = UtcNow]</text>
+  <!-- Transition: ONLINE -> STALE -->
+  <line x1="440" y1="283" x2="440" y2="350" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="345" y="306" width="190" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="440" y="321" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">No data &gt; 5 mins (StaleAfter)</text>
+  <!-- State: STALE -->
+  <rect x="360" y="350" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="440" y="374" font-size="11.5" font-weight="700" fill="#000000" text-anchor="middle">STALE</text>
+  <!-- Transition: STALE -> Watchdog Check -->
+  <line x1="440" y1="388" x2="440" y2="440" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="380" y="404" width="120" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="440" y="419" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Watchdog check</text>
+  <!-- Decision Diamond: Watchdog Resolution -->
+  <polygon points="440,440 455,455 440,470 425,455" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <!-- Branch: [Telemetry received] -> Recovered to ONLINE -->
+  <path d="M 455 455 H 610 V 264 H 520" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="540" y="350" width="140" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="610" y="365" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[Telemetry received]</text>
+  <!-- Branch: [Timeout > 15 mins] -> Connection lost to OFFLINE -->
+  <path d="M 440 470 V 510 H 730 V 161 H 520" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="655" y="325" width="150" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="730" y="340" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[Timeout &gt; 15 mins]</text>
+  <!-- Bottom Summary Note -->
+  <rect x="130" y="575" width="600" height="24" rx="4" fill="#f8f8f8" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="591" font-size="9.5" font-weight="600" fill="#333333" text-anchor="middle">Rule: Inactive devices reject telemetry (409 Conflict). Stale threshold is 5 mins without data.</text>
+</svg>

@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "SmartFarm",
+    "slug": "smartfarm-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/smartfarm-icon.png",
+    "scheme": "smartfarm",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "icon": "./assets/images/smartfarm-icon.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#4F8F68",
+        "foregroundImage": "./assets/images/smartfarm-mark-white.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/smartfarm-icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#173622",
+          "image": "./assets/images/smartfarm-mark-white.png",
+          "imageWidth": 112
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

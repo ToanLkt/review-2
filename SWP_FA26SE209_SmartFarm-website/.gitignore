@@ -1,0 +1,11 @@
+.DS_Store
+.env
+**/.env
+.codebase-memory/
+**/bin/
+**/obj/
+BackEnd/mqtt/config/password.txt
+BackEnd/mqtt/data/
+BackEnd/mqtt/log/
+BackEnd/.env.mqtt.local
+BackEnd/osrm/

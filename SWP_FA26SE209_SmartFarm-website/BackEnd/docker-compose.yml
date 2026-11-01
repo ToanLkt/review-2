@@ -1,0 +1,105 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: SmartFarm.Api/Dockerfile
+    container_name: smartfarm-api
+    restart: unless-stopped
+    env_file:
+      - path: .env.mqtt.local
+        required: false
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__Default: Server=mysql;Port=3306;Database=smartfarm;User=smartfarm;Password=smartfarm;
+      Jwt__Key: ${JWT_SECRET:-local-docker-secret-key-change-before-production}
+      # Production vẫn bật Swagger (demo đồ án) + seed dữ liệu mẫu idempotent lần đầu.
+      Swagger__Enabled: ${SWAGGER_ENABLED:-true}
+      Seed__Enabled: ${SEED_ENABLED:-true}
+      # URL công khai để sinh link ảnh camera + whitelist CORS cho frontend.
+      Camera__PublicBaseUrl: ${CAMERA_PUBLIC_BASE_URL:-https://api.sumfas.id.vn}
+      Camera__MaxFileSizeBytes: ${CAMERA_MAX_FILE_SIZE_BYTES:-5242880}
+      Cors__Origins__0: ${CORS_ORIGIN_0:-https://sumfas.id.vn}
+      Cors__Origins__1: ${CORS_ORIGIN_1:-https://api.sumfas.id.vn}
+      Cors__Origins__2: ${CORS_ORIGIN_2:-http://localhost:3000}
+      Smtp__Host: ${SMTP_HOST:-smtp.gmail.com}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__User: ${SMTP_USER:-}
+      Smtp__Password: ${SMTP_PASSWORD:-}
+      Smtp__FromName: ${SMTP_FROM_NAME:-SmartFarm}
+      SePay__WebhookSecret: ${SEPAY_WEBHOOK_SECRET:-}
+      SePay__BankName: ${SEPAY_BANK_NAME:-}
+      SePay__BankBin: ${SEPAY_BANK_BIN:-}
+      SePay__BankAccountNumber: ${SEPAY_BANK_ACCOUNT_NUMBER:-}
+      SePay__AccountName: ${SEPAY_ACCOUNT_NAME:-}
+      Mqtt__Enabled: ${MQTT_ENABLED:-true}
+      Mqtt__Host: mqtt
+      Mqtt__Port: 1883
+      Mqtt__ClientId: smartfarm-backend
+      # OSRM: tính khoảng cách giao hàng.
+      Osrm__Enabled: ${OSRM_ENABLED:-false}
+      Osrm__BaseUrl: ${OSRM_BASE_URL:-http://osrm:5000}
+      Osrm__Profile: ${OSRM_PROFILE:-driving}
+      Osrm__TimeoutSeconds: ${OSRM_TIMEOUT_SECONDS:-10}
+      # Cloudflare R2: Lưu trữ ảnh camera khay rau lên Cloudflare CDN miễn phí.
+      CloudflareR2__Enabled: ${CLOUDFLARE_R2_ENABLED:-true}
+      CloudflareR2__AccountId: ${CLOUDFLARE_R2_ACCOUNT_ID:-01b3ea4a9b2b7688c31200a9ec8af968}
+      CloudflareR2__BucketName: ${CLOUDFLARE_R2_BUCKET_NAME:-smartfarm-camera}
+      CloudflareR2__ApiToken: ${CLOUDFLARE_R2_API_TOKEN:-}
+      CloudflareR2__PublicDomain: ${CLOUDFLARE_R2_PUBLIC_DOMAIN:-https://pub-7dfeb459c49842f69ca547ad3bb40357.r2.dev}
+    ports:
+      - "5080:8080"
+    volumes:
+      # Ảnh camera upload nằm ngoài image -> không mất khi rebuild container.
+      - smartfarm-uploads:/app/wwwroot/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: smartfarm-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mqtt/config/password.txt:/mosquitto/config/password.txt:ro
+      - ./mqtt/data:/mosquitto/data
+      - ./mqtt/log:/mosquitto/log
+
+  # OSRM routing server (Project-OSRM/osrm-backend) để tính khoảng cách giao hàng.
+  osrm:
+    image: osrm/osrm-backend:latest
+    container_name: smartfarm-osrm
+    restart: unless-stopped
+    command: osrm-routed --algorithm mld /data/vietnam-latest.osrm
+    volumes:
+      - ./osrm:/data
+    ports:
+      - "5001:5000"
+
+  mysql:
+    image: mysql:8.0
+    container_name: smartfarm-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: smartfarm
+      MYSQL_USER: smartfarm
+      MYSQL_PASSWORD: smartfarm
+    ports:
+      - "3307:3306"
+    volumes:
+      - smartfarm-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  smartfarm-mysql:
+  smartfarm-uploads:

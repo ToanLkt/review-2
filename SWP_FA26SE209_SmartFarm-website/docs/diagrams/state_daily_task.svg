@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 740" width="820" height="740" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#000000" />
+    </marker>
+  </defs>
+  <!-- Title Container -->
+  <rect x="20" y="16" width="780" height="50" fill="#f8f8f8" stroke="#000000" stroke-width="1.5" rx="4"/>
+  <text x="410" y="38" font-size="16" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="0.5">State Machine Diagram: Daily Task Lifecycle</text>
+  <text x="410" y="55" font-size="11" font-weight="400" fill="#555555" text-anchor="middle">Care Task Scheduling, Execution, Resolution &amp; Completion</text>
+  <rect x="20" y="76" width="780" height="644" fill="#ffffff" stroke="#000000" stroke-width="1.5" rx="4"/>
+  <!-- Initial State: Task Generation -->
+  <circle cx="340" cy="106" r="8" fill="#000000" stroke="#000000" stroke-width="1.5"/>
+  <line x1="340" y1="114" x2="340" y2="150" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="245" y="122" width="190" height="20" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="340" y="136" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">Task scheduled (00:00 UTC)</text>
+  <!-- State: PENDING -->
+  <rect x="260" y="150" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="340" y="174" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">PENDING</text>
+  <!-- Transition: PENDING -> IN_PROGRESS -->
+  <line x1="340" y1="188" x2="340" y2="255" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="245" y="211" width="190" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="340" y="226" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Staff assigned &amp; starts care</text>
+  <!-- State: IN_PROGRESS -->
+  <rect x="260" y="255" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="340" y="279" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">IN_PROGRESS</text>
+  <!-- Transition: PENDING -> OVERDUE -->
+  <path d="M 420 169 H 640 V 255" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="580" y="195" width="120" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="640" y="210" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">DueDate passed</text>
+  <!-- Transition: IN_PROGRESS -> OVERDUE -->
+  <line x1="420" y1="274" x2="560" y2="274" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="435" y="263" width="110" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="490" y="278" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">Deadline expired</text>
+  <!-- State: OVERDUE -->
+  <rect x="560" y="255" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="640" y="279" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">OVERDUE</text>
+  <!-- Transition: IN_PROGRESS -> Decision Diamond -->
+  <line x1="340" y1="293" x2="340" y2="360" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="265" y="316" width="150" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="340" y="331" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">CompleteTaskAsync()</text>
+  <!-- Decision Diamond: Status Evaluation -->
+  <polygon points="340,360 355,375 340,390 325,375" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <!-- Branch: [Status = COMPLETED] -> COMPLETED -->
+  <path d="M 325 375 H 200 V 450" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="125" y="405" width="150" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="200" y="420" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[Status = COMPLETED]</text>
+  <!-- State: COMPLETED -->
+  <rect x="120" y="450" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="200" y="474" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">COMPLETED</text>
+  <!-- Branch: [Status = SKIPPED] -> SKIPPED -->
+  <path d="M 355 375 H 480 V 450" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="405" y="405" width="150" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="480" y="420" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[Status = SKIPPED]</text>
+  <!-- State: SKIPPED -->
+  <rect x="400" y="450" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="480" y="474" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">SKIPPED</text>
+  <!-- Transition: OVERDUE resolution -->
+  <path d="M 640 293 V 560 H 340" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <rect x="555" y="480" width="170" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="640" y="495" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Alert acknowledged / Done</text>
+  <!-- Transition: COMPLETED -> Final merge -->
+  <path d="M 200 488 V 560 H 340" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <!-- Transition: SKIPPED -> Final merge -->
+  <path d="M 480 488 V 560 H 340" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <!-- Final Arrow to Bullseye -->
+  <line x1="340" y1="560" x2="340" y2="588" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Final State (Bullseye) -->
+  <circle cx="340" cy="602" r="12" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <circle cx="340" cy="602" r="6" fill="#000000"/>
+  <!-- Bottom Summary Note -->
+  <rect x="140" y="665" width="540" height="24" rx="4" fill="#f8f8f8" stroke="#000000" stroke-width="1"/>
+  <text x="410" y="681" font-size="9.5" font-weight="600" fill="#333333" text-anchor="middle">Rule: Daily tasks terminate in COMPLETED or SKIPPED; unworked tasks become OVERDUE.</text>
+</svg>

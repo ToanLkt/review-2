@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 800" width="860" height="800" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#000000" />
+    </marker>
+  </defs>
+  <!-- Title Container -->
+  <rect x="20" y="16" width="820" height="50" fill="#f8f8f8" stroke="#000000" stroke-width="1.5" rx="4"/>
+  <text x="430" y="38" font-size="16" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="0.5">State Machine Diagram: Delivery Lifecycle</text>
+  <text x="430" y="55" font-size="11" font-weight="400" fill="#555555" text-anchor="middle">Multi-attempt Dispatch, Courier Transit, Customer Pickup &amp; Resolution</text>
+  <rect x="20" y="76" width="820" height="704" fill="#ffffff" stroke="#000000" stroke-width="1.5" rx="4"/>
+  <!-- Initial State: Delivery Creation -->
+  <circle cx="430" cy="104" r="8" fill="#000000" stroke="#000000" stroke-width="1.5"/>
+  <line x1="430" y1="112" x2="430" y2="146" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="315" y="120" width="230" height="20" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="134" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">CreateDeliveryAsync() [Crop HARVESTED]</text>
+  <!-- State: PENDING -->
+  <rect x="350" y="146" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="430" y="170" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">PENDING</text>
+  <!-- Transition: PENDING -> PACKAGED -->
+  <line x1="430" y1="184" x2="430" y2="240" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="345" y="202" width="170" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="217" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Packaging completed</text>
+  <!-- State: PACKAGED -->
+  <rect x="350" y="240" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="430" y="264" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">PACKAGED</text>
+  <!-- Self-Transition: Assign Shipper -->
+  <path d="M 350 250 H 300 V 270 H 350" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="290" y="258" font-size="8.5" font-weight="600" fill="#000000" text-anchor="end">Assign shipper</text>
+  <text x="290" y="270" font-size="8" fill="#555555" text-anchor="end">[AssignAsync]</text>
+  <!-- Transition: PACKAGED -> SHIPPING -->
+  <line x1="430" y1="278" x2="430" y2="336" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="315" y="297" width="230" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="312" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Shipper pickup &amp; dispatch [Atomic SALE]</text>
+  <!-- State: SHIPPING -->
+  <rect x="350" y="336" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="430" y="360" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">SHIPPING</text>
+  <!-- Transition: SHIPPING -> Delivery Success? -->
+  <line x1="430" y1="374" x2="430" y2="420" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="345" y="387" width="170" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="402" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">Transport to destination</text>
+  <!-- Decision Diamond: Delivery Evaluation -->
+  <polygon points="430,420 445,435 430,450 415,435" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <!-- Branch 1: [Delivered] -> DELIVERED -->
+  <path d="M 415 435 H 200 V 495" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="115" y="455" width="170" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="200" y="470" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[Proof photo &amp; signature]</text>
+  <!-- State: DELIVERED -->
+  <rect x="120" y="495" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="200" y="519" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">DELIVERED</text>
+  <!-- Branch 2: [1st attempt failed] -> FAILED -->
+  <path d="M 445 435 H 660 V 475" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="560" y="445" width="200" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="660" y="460" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[1st attempt failed / Unreachable]</text>
+  <!-- State: FAILED -->
+  <rect x="580" y="475" width="160" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="660" y="499" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">FAILED</text>
+  <!-- Transition: FAILED -> SHIPPING (Re-dispatch 2nd attempt) -->
+  <path d="M 740 494 H 790 V 355 H 510" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="615" y="344" width="160" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="695" y="359" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[Re-dispatch (2nd attempt)]</text>
+  <!-- Branch 3: [2nd attempt failed] -> AWAITING_CUSTOMER_SHIPPING -->
+  <path d="M 430 450 V 590 H 540" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="360" y="515" width="140" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="530" font-size="9.5" font-weight="600" fill="#000000" text-anchor="middle">[2nd attempt failed]</text>
+  <!-- State: AWAITING_CUSTOMER_SHIPPING -->
+  <rect x="540" y="571" width="240" height="38" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+  <text x="660" y="595" font-size="10.5" font-weight="700" fill="#000000" text-anchor="middle">AWAITING_CUSTOMER_SHIPPING</text>
+  <!-- Transition: AWAITING_CUSTOMER_SHIPPING -> DELIVERED (Customer pickup) -->
+  <path d="M 600 609 V 646 H 200 V 533" fill="none" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="330" y="635" width="200" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="650" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">[Customer pickup / Self-arranged delivery]</text>
+  <!-- Transition: DELIVERED -> Final State -->
+  <path d="M 160 533 V 690 H 430" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <!-- Transition: AWAITING_CUSTOMER_SHIPPING -> Final State (Expired / Cancelled) -->
+  <path d="M 720 609 V 690 H 430" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <rect x="635" y="635" width="170" height="22" rx="3" fill="#eef1f5" stroke="#000000" stroke-width="1"/>
+  <text x="720" y="650" font-size="9" font-weight="600" fill="#000000" text-anchor="middle">[Cancelled / Shelf-life expired]</text>
+  <!-- Final Arrow to Bullseye -->
+  <line x1="430" y1="690" x2="430" y2="710" stroke="#000000" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Final State (Bullseye) -->
+  <circle cx="430" cy="722" r="12" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <circle cx="430" cy="722" r="6" fill="#000000"/>
+  <!-- Bottom Summary Note -->
+  <rect x="90" y="748" width="680" height="24" rx="4" fill="#f8f8f8" stroke="#000000" stroke-width="1"/>
+  <text x="430" y="764" font-size="9.5" font-weight="600" fill="#333333" text-anchor="middle">Rule: 2 delivery attempts allowed. 2nd failure transitions to AWAITING_CUSTOMER_SHIPPING. DELIVERED is terminal.</text>
+</svg>
