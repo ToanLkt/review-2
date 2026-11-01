@@ -23,7 +23,7 @@ public interface ICartService
 /// </summary>
 public sealed class CartService(AppDbContext db, NotificationService? notifications = null, IRoutingService? routing = null) : ICartService
 {
-    private const int PaymentWindowMinutes = 30;
+    private const int PaymentWindowMinutes = 15;
     private readonly DeliveryPricingService _deliveryPricing = new(db, routing);
 
     public async Task<CartResponse> GetAsync(int customerId)

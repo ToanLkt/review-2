@@ -183,6 +183,7 @@ public class PriorityFiveIoTManagementTests
 
         Assert.StartsWith("https://pub-test.r2.dev/", res.ImageUrl);
         Assert.EndsWith(".jpg", res.ImageUrl);
+        Assert.Equal(DateTimeKind.Utc, res.TakenAt.Kind);
     }
 
     private sealed class FakeHttpHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler
@@ -200,7 +201,37 @@ public class PriorityFiveIoTManagementTests
     private sealed class FakeCommandPublisher(bool fail=false):IActuatorCommandPublisher
     {
         public ActuatorCommandMessage? Published{get;private set;}
+        public DeviceThresholdMessage? PublishedThreshold{get;private set;}
+
         public Task PublishAsync(ActuatorCommandMessage command,CancellationToken cancellationToken=default)
         {if(fail)throw new InvalidOperationException("broker unavailable");Published=command;return Task.CompletedTask;}
+
+        public Task PublishThresholdAsync(DeviceThresholdMessage threshold,CancellationToken cancellationToken=default)
+        {if(fail)throw new InvalidOperationException("broker unavailable");PublishedThreshold=threshold;return Task.CompletedTask;}
+    }
+
+    [Fact]
+    public async Task Create_and_update_threshold_pushes_mqtt_threshold_to_device()
+    {
+        await using var db = Context();
+        var publisher = new FakeCommandPublisher();
+        var service = new CultivationService(db, null, publisher);
+
+        var seed = new Supply { SupplyName = "Rau Cải", SupplyType = SupplyType.Seed, HarvestDays = 5 };
+        db.Add(seed);
+        var esp = new IoTDevice { DeviceCode = "ESP32-TEST-01", DeviceType = "ESP32", Status = DeviceStatuses.Online };
+        db.Add(esp);
+        await db.SaveChangesAsync();
+
+        var req = new CropThresholdRequest(seed.SupplyId, GrowthStage.Growing, 30f, 45f, 60f, 80f, 20f, 32f, 1000f, 2000f, 12);
+        var created = await service.CreateThresholdAsync(req);
+        Assert.NotNull(publisher.PublishedThreshold);
+        Assert.Equal("ESP32-TEST-01", publisher.PublishedThreshold.DeviceCode);
+        Assert.Equal(30f, publisher.PublishedThreshold.MinSoilMoisture);
+
+        var updateReq = new CropThresholdRequest(seed.SupplyId, GrowthStage.Growing, 35f, 50f, 65f, 85f, 22f, 30f, 1200f, 2200f, 14);
+        await service.UpdateThresholdAsync(created.ThresholdId, updateReq);
+        Assert.Equal(35f, publisher.PublishedThreshold.MinSoilMoisture);
+        Assert.Equal(30f, publisher.PublishedThreshold.MaxTemperature);
     }
 }

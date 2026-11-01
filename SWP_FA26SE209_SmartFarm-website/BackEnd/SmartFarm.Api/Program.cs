@@ -88,6 +88,8 @@ builder.Services.AddControllers(options =>
     // System.Text.Json gặp vòng lặp tham chiếu và ném lỗi -> 500 lúc serialize dù dữ liệu đã lưu.
     // Bỏ qua chu trình để serialize an toàn thay vì vỡ.
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+    options.JsonSerializerOptions.Converters.Add(new NullableUtcDateTimeJsonConverter());
 }).AddXmlDataContractSerializerFormatters();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -143,3 +145,26 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+public sealed class UtcDateTimeJsonConverter : System.Text.Json.Serialization.JsonConverter<DateTime>
+{
+    public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        => reader.GetDateTime().ToUniversalTime();
+
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
+        => writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss.ffffffZ"));
+}
+
+public sealed class NullableUtcDateTimeJsonConverter : System.Text.Json.Serialization.JsonConverter<DateTime?>
+{
+    public override DateTime? Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        => reader.TokenType == System.Text.Json.JsonTokenType.Null ? null : reader.GetDateTime().ToUniversalTime();
+
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime? value, System.Text.Json.JsonSerializerOptions options)
+    {
+        if (value.HasValue)
+            writer.WriteStringValue(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ss.ffffffZ"));
+        else
+            writer.WriteNullValue();
+    }
+}

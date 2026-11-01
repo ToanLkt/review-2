@@ -22,7 +22,7 @@ public sealed class OrderService(AppDbContext db,NotificationService? notificati
 {
     private readonly DeliveryPricingService _deliveryPricing = new(db, routing);
 
-    private const int PaymentWindowMinutes = 30;
+    private const int PaymentWindowMinutes = 15;
 
     private static readonly IReadOnlyDictionary<string, string> NextStatus =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

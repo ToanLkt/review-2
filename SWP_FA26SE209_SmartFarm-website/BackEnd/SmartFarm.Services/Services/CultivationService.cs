@@ -5,7 +5,7 @@ using SmartFarm.Services.Models;
 
 namespace SmartFarm.Services.Services;
 
-public class CultivationService(AppDbContext db,NotificationService? notifications=null)
+public class CultivationService(AppDbContext db,NotificationService? notifications=null,IActuatorCommandPublisher? commandPublisher=null)
 {
     private static readonly string[] SupplyTypes=[SupplyType.Seed,SupplyType.SoilSubstrate,SupplyType.Packaging,SupplyType.Equipment];
     private static readonly string[] Stages=[GrowthStage.Germination,GrowthStage.Growing,GrowthStage.Harvest];
@@ -18,8 +18,8 @@ public class CultivationService(AppDbContext db,NotificationService? notificatio
     public async Task DeactivateSupplyAsync(int id){var x=await FindSupplyAsync(id);x.IsActive=false;await db.SaveChangesAsync();}
 
     public async Task<List<CropThresholdResponse>> ThresholdsAsync(int? supplyId)=>(await db.CropThresholds.AsNoTracking().Where(x=>!supplyId.HasValue||x.SupplyId==supplyId).OrderBy(x=>x.SupplyId).ThenBy(x=>x.Stage).ToListAsync()).Select(ToDto).ToList();
-    public async Task<CropThresholdResponse> CreateThresholdAsync(CropThresholdRequest r){await FindSupplyAsync(r.SupplyId);ValidateThreshold(r);if(await db.CropThresholds.AnyAsync(x=>x.SupplyId==r.SupplyId&&x.Stage==r.Stage.ToUpper()))throw new AppException(409,"Threshold for this supply and stage already exists.");var x=new CropThreshold();Apply(x,r);db.Add(x);await db.SaveChangesAsync();return ToDto(x);}
-    public async Task<CropThresholdResponse> UpdateThresholdAsync(int id,CropThresholdRequest r){var x=await db.CropThresholds.FindAsync(id)??throw new AppException(404,"Crop threshold not found.");await FindSupplyAsync(r.SupplyId);ValidateThreshold(r);if(await db.CropThresholds.AnyAsync(y=>y.ThresholdId!=id&&y.SupplyId==r.SupplyId&&y.Stage==r.Stage.ToUpper()))throw new AppException(409,"Threshold for this supply and stage already exists.");Apply(x,r);await db.SaveChangesAsync();return ToDto(x);}
+    public async Task<CropThresholdResponse> CreateThresholdAsync(CropThresholdRequest r){await FindSupplyAsync(r.SupplyId);ValidateThreshold(r);if(await db.CropThresholds.AnyAsync(x=>x.SupplyId==r.SupplyId&&x.Stage==r.Stage.ToUpper()))throw new AppException(409,"Threshold for this supply and stage already exists.");var x=new CropThreshold();Apply(x,r);db.Add(x);await db.SaveChangesAsync();await PushThresholdToAssignedDevicesAsync(x);return ToDto(x);}
+    public async Task<CropThresholdResponse> UpdateThresholdAsync(int id,CropThresholdRequest r){var x=await db.CropThresholds.FindAsync(id)??throw new AppException(404,"Crop threshold not found.");await FindSupplyAsync(r.SupplyId);ValidateThreshold(r);if(await db.CropThresholds.AnyAsync(y=>y.ThresholdId!=id&&y.SupplyId==r.SupplyId&&y.Stage==r.Stage.ToUpper()))throw new AppException(409,"Threshold for this supply and stage already exists.");Apply(x,r);await db.SaveChangesAsync();await PushThresholdToAssignedDevicesAsync(x);return ToDto(x);}
     public async Task DeleteThresholdAsync(int id){var x=await db.CropThresholds.FindAsync(id)??throw new AppException(404,"Crop threshold not found.");db.Remove(x);await db.SaveChangesAsync();}
 
     public async Task<List<CareScheduleResponse>> SchedulesAsync(int? supplyId)=>(await db.CareSchedules.AsNoTracking().Where(x=>!supplyId.HasValue||x.SupplyId==supplyId).OrderBy(x=>x.DayIndex).ToListAsync()).Select(ToDto).ToList();
@@ -82,4 +82,48 @@ public class CultivationService(AppDbContext db,NotificationService? notificatio
     private static void ValidateThreshold(CropThresholdRequest r){ValidateStage(r.Stage);if(r.MinSoilMoisture>r.MaxSoilMoisture||r.MinAirHumidity>r.MaxAirHumidity||r.MinTemperature>r.MaxTemperature||r.MinLightIntensity>r.MaxLightIntensity)throw new AppException(400,"Each minimum threshold must be less than or equal to its maximum.");}
     private static void Apply(CropThreshold x,CropThresholdRequest r){x.SupplyId=r.SupplyId;x.Stage=r.Stage.ToUpper();x.MinSoilMoisture=r.MinSoilMoisture;x.MaxSoilMoisture=r.MaxSoilMoisture;x.MinAirHumidity=r.MinAirHumidity;x.MaxAirHumidity=r.MaxAirHumidity;x.MinTemperature=r.MinTemperature;x.MaxTemperature=r.MaxTemperature;x.MinLightIntensity=r.MinLightIntensity;x.MaxLightIntensity=r.MaxLightIntensity;x.LightHoursPerDay=r.LightHoursPerDay;}
     private static void Apply(CareSchedule x,CareScheduleRequest r){x.SupplyId=r.SupplyId;x.DayIndex=r.DayIndex;x.TaskName=r.TaskName.Trim();x.TaskDescription=r.TaskDescription;x.TargetStage=r.TargetStage.ToUpper();}
+
+    private async Task PushThresholdToAssignedDevicesAsync(CropThreshold x)
+    {
+        if(commandPublisher is null)return;
+        try
+        {
+            var deviceCodes=await db.TrayRentals.AsNoTracking()
+                .Where(r=>r.SupplyId==x.SupplyId&&r.CropStatus!=CropStatus.Harvested&&r.CropStatus!=CropStatus.Failed)
+                .Join(db.TrayDevices.AsNoTracking().Where(td=>td.IsActive),
+                      r=>r.SoilTrayId,
+                      td=>td.SoilTrayId,
+                      (r,td)=>td.DeviceId)
+                .Distinct()
+                .Join(db.IoTDevices.AsNoTracking().Where(d=>d.Status!=DeviceStatuses.Inactive),
+                      deviceId=>deviceId,
+                      d=>d.DeviceId,
+                      (deviceId,d)=>d.DeviceCode)
+                .Distinct()
+                .ToListAsync();
+
+            if(deviceCodes.Count==0)
+            {
+                deviceCodes=await db.IoTDevices.AsNoTracking()
+                    .Where(d=>d.DeviceType=="ESP32"&&d.Status!=DeviceStatuses.Inactive)
+                    .Select(d=>d.DeviceCode)
+                    .ToListAsync();
+            }
+
+            foreach(var code in deviceCodes)
+            {
+                await commandPublisher.PublishThresholdAsync(new(
+                    code,x.SupplyId,x.Stage,
+                    x.MinSoilMoisture,x.MaxSoilMoisture,
+                    x.MinAirHumidity,x.MaxAirHumidity,
+                    x.MinTemperature,x.MaxTemperature,
+                    x.MinLightIntensity,x.MaxLightIntensity,
+                    x.LightHoursPerDay));
+            }
+        }
+        catch
+        {
+            // Ignore MQTT broker outage to prevent blocking DB operations
+        }
+    }
 }

@@ -18,9 +18,24 @@ public record ActuatorCommandMessage(string CommandId,string DeviceCode,string A
 public record ActuatorCommandAckRequest([Required,MaxLength(100)]string CommandId,[Required,MaxLength(100)]string DeviceCode,
     [Required,MaxLength(20)]string Result,[MaxLength(500)]string? FailureReason,DateTime? AcknowledgedAt);
 
+public record DeviceThresholdMessage(
+    string DeviceCode,
+    int SupplyId,
+    string Stage,
+    float? MinSoilMoisture,
+    float? MaxSoilMoisture,
+    float MinAirHumidity,
+    float MaxAirHumidity,
+    float MinTemperature,
+    float MaxTemperature,
+    float MinLightIntensity,
+    float MaxLightIntensity,
+    int LightHoursPerDay);
+
 public interface IActuatorCommandPublisher
 {
     Task PublishAsync(ActuatorCommandMessage command,CancellationToken cancellationToken=default);
+    Task PublishThresholdAsync(DeviceThresholdMessage threshold,CancellationToken cancellationToken=default);
 }
 
 public record IoTDeviceResponse(int DeviceId,string DeviceCode,string? MacAddress,string DeviceType,string? FirmwareVersion,string Status,DateTime? LastSeen);

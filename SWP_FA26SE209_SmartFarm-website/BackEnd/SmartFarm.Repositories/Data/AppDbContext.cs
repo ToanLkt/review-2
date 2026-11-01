@@ -25,6 +25,26 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         b.Entity<Review>().HasKey(x=>x.ReviewId); b.Entity<Review>().HasIndex(x=>x.OrderId).IsUnique(); b.Entity<Review>().HasOne(x=>x.Order).WithMany().HasForeignKey(x=>x.OrderId).OnDelete(DeleteBehavior.Cascade); b.Entity<Review>().HasOne(x=>x.Customer).WithMany().HasForeignKey(x=>x.CustomerId).OnDelete(DeleteBehavior.Restrict); b.Entity<Review>().ToTable(t=>t.HasCheckConstraint("CK_Review_Rating","`Rating` BETWEEN 1 AND 5"));
     }
 
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<NullableUtcDateTimeConverter>();
+    }
+
+    private sealed class UtcDateTimeConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>
+    {
+        public UtcDateTimeConverter() : base(
+            d => d.ToUniversalTime(),
+            d => DateTime.SpecifyKind(d, DateTimeKind.Utc)) { }
+    }
+
+    private sealed class NullableUtcDateTimeConverter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableUtcDateTimeConverter() : base(
+            d => d.HasValue ? d.Value.ToUniversalTime() : d,
+            d => d.HasValue ? DateTime.SpecifyKind(d.Value, DateTimeKind.Utc) : d) { }
+    }
+
     // Tự động cập nhật User.UpdatedAt mỗi khi bản ghi User bị sửa, để không phải set thủ công ở từng service.
     private void TouchUpdatedUsers()
     {

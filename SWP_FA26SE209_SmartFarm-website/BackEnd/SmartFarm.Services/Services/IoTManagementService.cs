@@ -240,7 +240,7 @@ public sealed class IoTManagementService(
     private static string NormalizeAction(string value){var result=value.Trim().ToUpperInvariant();if(result is not ("ON" or "OFF"))throw new AppException(400,"Action must be ON or OFF.");return result;}
     private static IoTDeviceResponse ToDto(IoTDevice x)=>new(x.DeviceId,x.DeviceCode,x.MacAddress,x.DeviceType,x.FirmwareVersion,x.Status,x.LastSeen);
     private static TrayDeviceResponse ToDto(TrayDevice x)=>new(x.TrayDeviceId,x.SoilTrayId,x.SoilTray?.TrayCode??"",x.DeviceId,x.Device?.DeviceCode??"",x.PinNumber,x.ComponentType,x.AssignedAt,x.IsActive);
-    private static CameraSnapshotResponse ToDto(CameraSnapshot x)=>new(x.SnapshotId,x.DeviceId,x.RentalId,x.ImageUrl,x.TakenAt);
+    private static CameraSnapshotResponse ToDto(CameraSnapshot x)=>new(x.SnapshotId,x.DeviceId,x.RentalId,x.ImageUrl,DateTime.SpecifyKind(x.TakenAt,DateTimeKind.Utc));
     private static ActuatorLogResponse ToDto(ActuatorLog x)=>new(x.LogId,x.DeviceId,x.PinNumber,x.ActuatorType,x.Action,x.TriggeredBy,x.CommandId,x.RequestedByUserId,x.RequestedAt,x.AcknowledgedAt,x.Result,x.FailureReason);
     private static SystemAlertResponse ToDto(SystemAlert x)=>new(x.AlertId,x.DeviceId,x.SupplyId,x.RentalId,x.AlertType,x.Severity,x.Message,x.IsResolved,x.CreatedAt);
 }

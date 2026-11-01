@@ -422,7 +422,7 @@ AWAITING_PAYMENT -> CONFIRMED -> PREPARING -> DELIVERING -> COMPLETED
 
 - Gửi lại đúng trạng thái hiện tại là idempotent và không xử lý tài nguyên lần nữa.
 - Nhảy cóc hoặc quay lui trạng thái trả `409 Conflict`.
-- Worker chạy mỗi phút, chuyển đơn chưa thanh toán quá 30 phút sang `EXPIRED`, trả khay về `AVAILABLE` hoặc hoàn tồn kho `SEED_PACKET`.
+- Worker chạy mỗi phút, chuyển đơn chưa thanh toán quá 15 phút sang `EXPIRED`, trả khay về `AVAILABLE` hoặc hoàn tồn kho `SEED_PACKET`.
 - Việc hết hạn chỉ áp dụng cho đơn còn `AWAITING_PAYMENT`, nên gọi lặp không hoàn tài nguyên nhiều lần.
 
 ### 0.8. Payment/SePay và Delivery
@@ -481,7 +481,7 @@ Lưu ý Payment/Delivery:
 - **Thử lại thanh toán (Payment Retry):** Nếu thanh toán trước đó bị đánh dấu `FAILED` (ví dụ chuyển thiếu tiền `UNDERPAID`) nhưng đơn hàng vẫn còn hạn (`ExpiresAt > hiện tại`), khách gọi lại `POST /api/v1/payments/orders/{orderId}` sẽ tự động reset trạng thái Payment về `PENDING` để khách có thể thanh toán lại.
 - Staff/Admin được xem exception, ghi chú và xem báo cáo; Customer gọi các endpoint `/staff/payments/*` sẽ nhận `403`, request không có token nhận `401`.
 - Ghi chú exception không được rỗng. Báo cáo từ `from` lớn hơn `to` trả `400`.
-- Đơn chưa thanh toán hết hạn sau 30 phút; tồn kho hoặc khay đã giữ sẽ được hoàn đúng một lần.
+- Đơn chưa thanh toán hết hạn sau 15 phút; tồn kho hoặc khay đã giữ sẽ được hoàn đúng một lần.
 - Chỉ đơn `CONFIRMED` mới được tạo delivery.
 - Delivery chỉ đi theo `PENDING → PACKAGED → SHIPPING → DELIVERED`; chuyển sai trả `409`.
 
@@ -1476,7 +1476,7 @@ Cấu hình trang trại là **một bản ghi cố định** (ConfigId=1): tên
 
 **Giỏ hàng xem trước ưu đãi:** `GET /cart` và `POST /cart/items` trả thêm `discountPercent, discountAmount` (ưu đãi dự kiến khi checkout) và mỗi dòng có `targetPlantingDate`. `Total` của giỏ đã trừ ưu đãi dự kiến.
 
-**Đồng bộ thanh toán khi đơn hết hạn:** worker hết hạn đơn (`AWAITING_PAYMENT` quá 30 phút) nay cũng chuyển `Payment` PENDING của đơn đó sang `EXPIRED` (không còn treo PENDING).
+**Đồng bộ thanh toán khi đơn hết hạn:** worker hết hạn đơn (`AWAITING_PAYMENT` quá 15 phút) nay cũng chuyển `Payment` PENDING của đơn đó sang `EXPIRED` (không còn treo PENDING).
 
 Đặt trước (advance booking): khi tạo đơn thuê (`POST /rentals`) với `targetPlantingDate` xa hơn `maxPreOrderDays` ngày kể từ hôm nay → **409** "Planting date cannot be more than N days in advance.".
 

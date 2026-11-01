@@ -14,7 +14,7 @@ public interface IRentalService
 
 public sealed class RentalService(IUnitOfWork unit, IOrderService orders, DeliveryPricingService? deliveryPricing = null) : IRentalService
 {
-    private const int PaymentWindowMinutes = 30;
+    private const int PaymentWindowMinutes = 15;
 
     // % giảm giá theo cấu hình: đủ số chu kỳ, đủ số khay, hoặc khách thân thiết. Lấy mức cao nhất đủ điều kiện.
     private async Task<decimal> ResolveDiscountPercentAsync(int customerId, int trayCount, int cycles)
